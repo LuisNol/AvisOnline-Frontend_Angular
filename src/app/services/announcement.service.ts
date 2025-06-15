@@ -19,7 +19,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class AnnouncementService {
-  private baseUrl = environment.apiUrl || 'http://localhost:8000/api';
+  private baseUrl = environment.apiUrl;
   private announcementsSubject = new BehaviorSubject<Announcement[]>([]);
   public announcements$ = this.announcementsSubject.asObservable();
 

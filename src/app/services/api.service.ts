@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8000/api'; // Cambia por tu URL de backend
+   private baseUrl = environment.apiUrl ;
+  //private baseUrl = 'http://localhost:8000/api'; // Cambia por tu URL de backend
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 

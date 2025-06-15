@@ -46,7 +46,7 @@ export interface ProductDetailResponse {
   providedIn: 'root'
 })
 export class HomeService {
-  private baseUrl = environment.apiUrl || 'http://localhost:8000/api';
+  private baseUrl = environment.apiUrl ;
 
   constructor(private http: HttpClient) {}
 
