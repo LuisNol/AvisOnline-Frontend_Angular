@@ -40,8 +40,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   // Stats
   stats = {
-    total_announcements: 5,
-    total_users: 30,
+    total_announcements:0,
+    total_users: 0,
     satisfaction: 95,
     support: '24/7'
   };
