@@ -1,0 +1,349 @@
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-background"></div>
+  <div class="container">
+    <div class="row align-items-center min-vh-100">
+      <div class="col-lg-6">
+        <div class="hero-content" data-aos="fade-up">
+          <div class="hero-badge">
+            <i class="bi bi-star-fill text-warning me-2"></i>
+            <span>Plataforma #1 en Tingo María</span>
+          </div>
+          
+          <!-- Connection Status Badge -->
+          <div class="connection-status" *ngIf="categoriesError || announcementsError">
+            <div class="badge bg-warning text-dark">
+              <i class="bi bi-wifi-off me-1"></i>
+              Modo Demo - Datos de ejemplo
+            </div>
+          </div>
+          
+          <div class="connection-status" *ngIf="!categoriesError && !announcementsError && !isLoadingCategories && !isLoadingAnnouncements">
+            <div class="badge bg-success">
+              <i class="bi bi-wifi me-1"></i>
+              Conectado al servidor
+            </div>
+          </div>
+          
+          <h1 class="hero-title">
+            Encuentra lo que necesitas en 
+            <span class="text-gradient">AvisOnline</span>
+          </h1>
+          
+          <p class="hero-description">
+            La plataforma de anuncios clasificados más confiable de Tingo María. 
+            Conectamos compradores y vendedores locales de forma segura y eficiente.
+          </p>
+          
+          <div class="hero-actions">
+            <a routerLink="/anuncios" class="btn btn-primary btn-lg me-3">
+              <i class="bi bi-search me-2"></i>
+              Explorar Anuncios
+            </a>
+            <a href="https://www.admin.avisonline.store" target="_blank" class="btn btn-outline-light btn-lg">
+              <i class="bi bi-plus-circle me-2"></i>
+              Publicar Gratis
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="hero-stats" data-aos="fade-left">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number">{{(stats.total_announcements) | number:'1.0-0'}}</div>
+              <div class="stat-label">Anuncios Gratuitos</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">{{(stats.total_users) | number:'1.0-0'}}+</div>
+              <div class="stat-label">Usuarios Activos</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">{{stats.satisfaction}}%</div>
+              <div class="stat-label">Satisfacción</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">{{stats.support}}</div>
+              <div class="stat-label">Soporte</div>
+            </div>
+                      </div>
+          
+          <!-- Floating Elements -->
+          <div class="floating-elements">
+            <div class="floating-card card-1">
+              <i class="bi bi-car-front"></i>
+              <span>Vehículos</span>
+            </div>
+            <div class="floating-card card-2">
+              <i class="bi bi-house"></i>
+              <span>Inmuebles</span>
+            </div>
+            <div class="floating-card card-3">
+              <i class="bi bi-laptop"></i>
+              <span>Tecnología</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Wave Separator -->
+  <div class="hero-wave">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" fill="#ffffff"></path>
+    </svg>
+  </div>
+</section>
+
+
+
+<!-- Categories Section -->
+<section class="categories-section">
+  <div class="container">
+    <div class="section-header text-center" data-aos="fade-up">
+      <span class="section-subtitle">Explora por categorías</span>
+      <h2 class="section-title">Categorías Populares</h2>
+      <p class="section-description">
+        Encuentra exactamente lo que buscas navegando por nuestras categorías más populares
+      </p>
+    </div>
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoadingCategories" class="loading-state text-center" data-aos="fade-up">
+      <div class="spinner-border text-primary mb-3"></div>
+      <p class="text-muted">🚀 Conectando con el servidor...</p>
+      <small class="text-muted">Cargando categorías desde el backend</small>
+    </div>
+    
+    <!-- Error State -->
+    <div *ngIf="categoriesError && !isLoadingCategories" class="alert alert-warning text-center mx-auto" style="max-width: 600px;">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <strong>{{categoriesError}}</strong>
+      <br>
+      <small class="text-muted">Mostrando datos de ejemplo mientras se restablece la conexión</small>
+    </div>
+    
+    <!-- Top 4 Categories Grid -->
+    <div class="top-categories-grid" *ngIf="!isLoadingCategories && topCategories.length > 0" data-aos="fade-up" data-aos-delay="200">
+      <div 
+        class="category-card" 
+        *ngFor="let category of topCategories; trackBy: trackByCategory"
+        (click)="onCategoryClick(category.id, category.name)">
+        <div class="category-header">
+          <div class="category-icon">
+            <i [class]="getCategoryIcon(category.name)"></i>
+          </div>
+          <div class="category-badge">
+            {{category.count}}
+          </div>
+        </div>
+        <div class="category-content">
+          <h4 class="category-name">{{category.name}}</h4>
+          <p class="category-description">{{category.count}} anuncios disponibles</p>
+        </div>
+        <div class="category-footer">
+          <span class="explore-text">Explorar</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <!-- No Categories Message -->
+    <div *ngIf="!isLoadingCategories && topCategories.length === 0 && !categoriesError" class="text-center py-5">
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>No hay categorías disponibles</strong>
+        <br>
+        <small>El backend no devolvió ninguna categoría</small>
+      </div>
+    </div>
+    
+    <!-- Ver Más Button -->
+    <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="400">
+      <button (click)="toggleAllCategories()" class="btn btn-outline-primary btn-lg view-more-btn">
+        <i class="bi bi-grid-3x3-gap me-2"></i>
+        <span>{{showAllCategories ? 'Ocultar categorías' : 'Ver todas las categorías'}}</span>
+        <i [class]="showAllCategories ? 'bi bi-arrow-up ms-2' : 'bi bi-arrow-down ms-2'"></i>
+        <small class="d-block mt-1">{{showAllCategories ? 'Mostrar solo las más populares' : 'Explora ' + categories.length + ' categorías disponibles'}}</small>
+      </button>
+    </div>
+    
+    <!-- Remaining Categories Grid (Smaller) -->
+    <div class="remaining-categories-section" *ngIf="showAllCategories && remainingCategories.length > 0" data-aos="fade-up" data-aos-delay="500">
+      <div class="section-divider">
+        <hr class="divider-line">
+        <span class="divider-text">Más categorías</span>
+        <hr class="divider-line">
+      </div>
+      
+      <div class="remaining-categories-grid">
+        <div 
+          class="category-card-small" 
+          *ngFor="let category of remainingCategories; trackBy: trackByCategory"
+          (click)="onCategoryClick(category.id, category.name)">
+          <div class="category-icon-small">
+            <i [class]="getCategoryIcon(category.name)"></i>
+          </div>
+          <div class="category-info">
+            <h5 class="category-name-small">{{category.name}}</h5>
+            <span class="category-count-small">{{category.count}} anuncios</span>
+          </div>
+          <div class="category-arrow">
+            <i class="bi bi-arrow-right"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Navigation to All Announcements -->
+      <div class="text-center mt-4">
+        <button (click)="navigateToAnnouncementsWithSidebar()" class="btn btn-primary btn-sm">
+          <i class="bi bi-search me-2"></i>
+          Ir a búsqueda avanzada
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Announcements Section -->
+<section class="featured-products-section">
+  <div class="container">
+    <div class="section-header text-center" data-aos="fade-up">
+      <span class="section-subtitle">Lo mejor de AvisOnline</span>
+      <h2 class="section-title">Anuncios Recientes y Populares</h2>
+      <p class="section-description">
+        Descubre los anuncios más recientes y populares de nuestra comunidad en Tingo María
+      </p>
+    </div>
+    
+    <!-- Product Filter Tabs -->
+    <div class="product-filter-tabs" data-aos="fade-up" data-aos-delay="200">
+      <div class="filter-tabs-container">
+        <button 
+          class="filter-tab" 
+          [class.active]="currentAnnouncementView === 'recent'"
+          (click)="switchAnnouncementView('recent')">
+          <i class="bi bi-clock"></i>
+          <span>Recientes</span>
+        </button>
+        <button 
+          class="filter-tab" 
+          [class.active]="currentAnnouncementView === 'popular'"
+          (click)="switchAnnouncementView('popular')">
+          <i class="bi bi-fire"></i>
+          <span>Populares</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoadingAnnouncements" class="loading-state text-center" data-aos="fade-up">
+      <div class="spinner-border text-primary mb-3"></div>
+      <p class="text-muted">🚀 Conectando con el servidor...</p>
+      <small class="text-muted">Cargando anuncios desde el backend</small>
+    </div>
+    
+    <!-- Error State -->
+    <div *ngIf="announcementsError && !isLoadingAnnouncements" class="alert alert-warning text-center mx-auto mb-4" style="max-width: 600px;">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <strong>{{announcementsError}}</strong>
+      <br>
+      <small class="text-muted">Mostrando datos de ejemplo mientras se restablece la conexión</small>
+    </div>
+    
+    <!-- Announcements Grid -->
+    <div class="featured-products-container" *ngIf="!isLoadingAnnouncements && getCurrentAnnouncements().length > 0">
+      <div class="featured-products-grid" data-aos="fade-up" data-aos-delay="300">
+        <div 
+          class="featured-product-card" 
+          *ngFor="let announcement of getCurrentAnnouncements(); trackBy: trackByAnnouncement"
+          (click)="onAnnouncementClick(announcement)">
+          
+          <div class="product-image-container">
+            <img [src]="announcement.image" [alt]="announcement.title" loading="lazy" class="product-image">
+            <div class="product-overlay">
+              <div class="overlay-content">
+                <button class="quick-view-btn">
+                  <i class="bi bi-eye"></i>
+                  Ver detalles
+                </button>
+              </div>
+            </div>
+            <div class="product-badges">
+              <span class="badge badge-featured" *ngIf="announcement.featured">
+                <i class="bi bi-star-fill"></i>
+                Destacado
+              </span>
+              <span class="badge badge-new" *ngIf="isNewAnnouncement(announcement.created_at)">
+                <i class="bi bi-sparkle"></i>
+                Nuevo
+              </span>
+            </div>
+          </div>
+          
+          <div class="product-content">
+            <div class="product-header">
+              <span class="product-category">{{announcement.category}}</span>
+            </div>
+            
+            <h4 class="product-title">{{announcement.title}}</h4>
+            
+            <div class="product-price-container">
+              <div class="product-price">
+                <span class="currency">S/</span>
+                <span class="amount">{{formatPrice(announcement.price)}}</span>
+              </div>
+              <span class="price-label">Precio referencial</span>
+            </div>
+            
+            <div class="product-meta">
+              <div class="meta-item location">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span>{{announcement.location}}</span>
+              </div>
+              <div class="meta-item views">
+                <i class="bi bi-eye-fill"></i>
+                <span>{{announcement.views}} vistas</span>
+              </div>
+            </div>
+            
+            <div class="product-footer">
+              <span class="time-ago">{{getTimeAgo(announcement.created_at)}}</span>
+              <div class="action-buttons">
+                <button class="action-btn favorite" title="Guardar">
+                  <i class="bi bi-heart"></i>
+                </button>
+                <button class="action-btn share" title="Compartir">
+                  <i class="bi bi-share"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- No Announcements Message -->
+    <div *ngIf="!isLoadingAnnouncements && getCurrentAnnouncements().length === 0 && !announcementsError" class="text-center py-5">
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>No hay anuncios {{currentAnnouncementView === 'recent' ? 'recientes' : 'populares'}} disponibles</strong>
+        <br>
+        <small>El backend no devolvió ningún anuncio</small>
+      </div>
+    </div>
+    
+    <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="400">
+      <a routerLink="/anuncios" class="btn btn-primary btn-lg">
+        Ver todos los anuncios
+        <i class="bi bi-arrow-right ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+ 

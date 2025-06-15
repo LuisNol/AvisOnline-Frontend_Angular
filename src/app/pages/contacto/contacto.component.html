@@ -1,0 +1,323 @@
+<!-- Página de Contacto - AvisOnline -->
+<div class="contacto-page">
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="container">
+      <div class="row align-items-center min-vh-50">
+        <div class="col-lg-8 mx-auto text-center">
+          <div class="hero-content">
+            <h1 class="hero-title">
+              <span class="highlight">Contáctanos</span>
+            </h1>
+            <p class="hero-subtitle">
+              Estamos aquí para ayudarte. Envíanos tu consulta y te responderemos lo antes posible.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section py-5">
+    <div class="container">
+      <div class="row g-5">
+        
+        <!-- Contact Form -->
+        <div class="col-lg-8">
+          <div class="contact-form-container">
+            <div class="section-header">
+              <h2 class="section-title">Envíanos un mensaje</h2>
+              <p class="section-subtitle">
+                Completa el formulario y nos pondremos en contacto contigo pronto
+              </p>
+            </div>
+
+            <!-- Success Message -->
+            <div *ngIf="submitSuccess" class="alert alert-success" role="alert">
+              <i class="bi bi-check-circle me-2"></i>
+              <strong>¡Mensaje enviado!</strong> Gracias por contactarnos. Te responderemos pronto.
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="submitError" class="alert alert-danger" role="alert">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              <strong>Error:</strong> No se pudo enviar el mensaje. Inténtalo de nuevo.
+            </div>
+
+            <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+              <div class="row g-3">
+                <!-- Name -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="name" class="form-label">
+                      <i class="bi bi-person me-2"></i>Nombre completo
+                    </label>
+                    <input 
+                      type="text" 
+                      id="name"
+                      class="form-control"
+                      [class.is-invalid]="hasError('name')"
+                      formControlName="name"
+                      placeholder="Tu nombre completo">
+                    <div *ngIf="hasError('name')" class="invalid-feedback">
+                      {{ getErrorMessage('name') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="email" class="form-label">
+                      <i class="bi bi-envelope me-2"></i>Email
+                    </label>
+                    <input 
+                      type="email" 
+                      id="email"
+                      class="form-control"
+                      [class.is-invalid]="hasError('email')"
+                      formControlName="email"
+                      placeholder="tu@email.com">
+                    <div *ngIf="hasError('email')" class="invalid-feedback">
+                      {{ getErrorMessage('email') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="phone" class="form-label">
+                      <i class="bi bi-phone me-2"></i>Teléfono
+                    </label>
+                    <input 
+                      type="tel" 
+                      id="phone"
+                      class="form-control"
+                      [class.is-invalid]="hasError('phone')"
+                      formControlName="phone"
+                      placeholder="+51 964 261 822">
+                    <div *ngIf="hasError('phone')" class="invalid-feedback">
+                      {{ getErrorMessage('phone') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Subject -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="subject" class="form-label">
+                      <i class="bi bi-tag me-2"></i>Asunto
+                    </label>
+                    <input 
+                      type="text" 
+                      id="subject"
+                      class="form-control"
+                      [class.is-invalid]="hasError('subject')"
+                      formControlName="subject"
+                      placeholder="¿En qué podemos ayudarte?">
+                    <div *ngIf="hasError('subject')" class="invalid-feedback">
+                      {{ getErrorMessage('subject') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Message -->
+                <div class="col-12">
+                  <div class="form-group">
+                    <label for="message" class="form-label">
+                      <i class="bi bi-chat-text me-2"></i>Mensaje
+                    </label>
+                    <textarea 
+                      id="message"
+                      class="form-control"
+                      [class.is-invalid]="hasError('message')"
+                      formControlName="message"
+                      rows="5"
+                      placeholder="Escribe tu mensaje aquí..."></textarea>
+                    <div *ngIf="hasError('message')" class="invalid-feedback">
+                      {{ getErrorMessage('message') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-12">
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary btn-lg"
+                    [disabled]="isSubmitting">
+                    <span *ngIf="!isSubmitting">
+                      <i class="bi bi-send me-2"></i>
+                      Enviar Mensaje
+                    </span>
+                    <span *ngIf="isSubmitting">
+                      <div class="spinner-border spinner-border-sm me-2"></div>
+                      Enviando...
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="col-lg-4">
+          <div class="contact-info">
+            <h3 class="info-title">Información de contacto</h3>
+            <p class="info-subtitle">También puedes contactarnos directamente</p>
+
+            <!-- Contact Items -->
+            <div class="contact-items">
+              <!-- Address -->
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div class="contact-details">
+                  <h4>Dirección</h4>
+                  <p>{{ contactInfo.address }}</p>
+                </div>
+              </div>
+
+              <!-- Phone -->
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="bi bi-phone-fill"></i>
+                </div>
+                <div class="contact-details">
+                  <h4>Teléfono</h4>
+                  <p>
+                    <a (click)="callPhone()" class="contact-link">
+                      {{ contactInfo.phone }}
+                    </a>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="bi bi-envelope-fill"></i>
+                </div>
+                <div class="contact-details">
+                  <h4>Email</h4>
+                  <p>
+                    <a (click)="sendEmail()" class="contact-link">
+                      {{ contactInfo.email }}
+                    </a>
+                  </p>
+                </div>
+              </div>
+
+              <!-- WhatsApp -->
+              <div class="contact-item">
+                <div class="contact-icon whatsapp">
+                  <i class="bi bi-whatsapp"></i>
+                </div>
+                <div class="contact-details">
+                  <h4>WhatsApp</h4>
+                  <p>
+                    <a (click)="openWhatsApp()" class="contact-link">
+                      {{ contactInfo.whatsapp }}
+                    </a>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Hours -->
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="bi bi-clock-fill"></i>
+                </div>
+                <div class="contact-details">
+                  <h4>Horarios</h4>
+                  <p style="white-space: pre-line;">{{ contactInfo.hours }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="social-section">
+              <h4>Síguenos en redes sociales</h4>
+              <div class="social-links">
+                <button 
+                  *ngFor="let social of socialLinks"
+                  (click)="openSocialLink(social.url)"
+                  class="social-btn"
+                  [style.background-color]="social.color"
+                  [title]="social.name">
+                  <i [class]="'bi ' + social.icon"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <div class="section-header text-center">
+            <h2 class="section-title">Preguntas Frecuentes</h2>
+            <p class="section-subtitle">
+              Encuentra respuestas a las preguntas más comunes sobre AvisOnline
+            </p>
+          </div>
+
+          <div class="faq-accordion">
+            <div 
+              *ngFor="let faq of faqs; let i = index" 
+              class="faq-item"
+              [class.active]="faq.isOpen">
+              <button class="faq-question" (click)="toggleFaq(i)" type="button">
+                <h4>{{ faq.question }}</h4>
+                <i class="bi bi-chevron-down"></i>
+              </button>
+              <div class="faq-answer" [class.show]="faq.isOpen">
+                <p>{{ faq.answer }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+          <div class="cta-content">
+            <h2 class="cta-title">¿Listo para empezar?</h2>
+            <p class="cta-description">
+              Únete a miles de usuarios que ya confían en AvisOnline
+            </p>
+            <div class="cta-actions">
+              <a routerLink="/anuncios" class="btn btn-primary btn-lg">
+                <i class="bi bi-search me-2"></i>
+                Explorar Anuncios
+              </a>
+              <button (click)="openWhatsApp()" class="btn btn-outline-light btn-lg ms-3">
+                <i class="bi bi-whatsapp me-2"></i>
+                Chatea con nosotros
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div> 

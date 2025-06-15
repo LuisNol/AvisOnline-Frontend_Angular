@@ -1,0 +1,54 @@
+// Bootstrap
+@use 'bootstrap/scss/bootstrap' as *;
+
+// Bootstrap Icons
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+// Estilos globales para AvisOnline
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+// Estilos para cards de anuncios
+.announcement-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+}
+
+// Estilos para el header
+.navbar-brand {
+  font-weight: bold;
+  color: #007bff !important;
+}
+
+// Colores principales de AvisOnline
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+}
+
+// Main Content
+.main-content {
+  min-height: calc(100vh - 200px); // Ajustar según altura del header/footer
+  padding-top: 120px; // Espacio para el header fijo
+  
+  @media (max-width: 768px) {
+    padding-top: 80px; // Menos espacio en móvil
+  }
+}

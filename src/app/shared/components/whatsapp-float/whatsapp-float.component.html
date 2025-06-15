@@ -1,0 +1,60 @@
+<!-- WhatsApp Float Widget -->
+<div class="whatsapp-float" [class.visible]="isVisible" [class.expanded]="isExpanded">
+  <!-- Main Button -->
+  <div class="whatsapp-main-btn" (click)="toggleExpanded()">
+    <div class="whatsapp-icon">
+      <i class="bi bi-whatsapp"></i>
+    </div>
+    <div class="pulse-ring"></div>
+  </div>
+
+  <!-- Expanded Content -->
+  <div class="whatsapp-content" [class.show]="isExpanded">
+    <div class="whatsapp-header">
+      <div class="header-info">
+        <div class="avatar">
+          <i class="bi bi-megaphone-fill"></i>
+        </div>
+        <div class="info">
+          <h4>{{ contactInfo.name }}</h4>
+          <span class="status">
+            <span class="status-dot"></span>
+            En línea
+          </span>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeWidget()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <div class="whatsapp-body">
+      <div class="message-bubble">
+        <p>¡Hola! 👋</p>
+        <p>¿En qué podemos ayudarte hoy?</p>
+        <div class="message-time">{{ getCurrentTime() }}</div>
+      </div>
+    </div>
+
+    <div class="whatsapp-actions">
+      <button class="action-btn primary" (click)="openWhatsApp()">
+        <i class="bi bi-chat-dots"></i>
+        <span>Enviar mensaje</span>
+      </button>
+      
+      <button class="action-btn secondary" (click)="joinWhatsAppGroup()">
+        <i class="bi bi-people"></i>
+        <span>Únete al grupo</span>
+      </button>
+    </div>
+
+    <div class="whatsapp-footer">
+      <small>Respuesta típica en pocos minutos</small>
+    </div>
+  </div>
+
+  <!-- Tooltip when collapsed -->
+  <div class="whatsapp-tooltip" [class.show]="!isExpanded">
+    <span>¿Necesitas ayuda? ¡Escríbenos!</span>
+  </div>
+</div> 

@@ -1,0 +1,316 @@
+<div class="announcement-detail-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <h3>Cargando anuncio...</h3>
+      <p>Por favor espera un momento</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-content">
+      <h3>Error al cargar</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="goBack()">
+        ← Volver a anuncios
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="announcement && !loading && !error" class="main-content">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li><a (click)="goBack()">🏠 Inicio</a></li>
+          <li><a (click)="goBack()">Anuncios</a></li>
+          <li class="active">{{ announcement.title }}</li>
+        </ol>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-grid">
+          <!-- Image Gallery -->
+          <div class="image-gallery">
+            <div class="main-image-container">
+              <img 
+                [src]="getImageWithFallback(images[currentImageIndex])"
+                [alt]="announcement.title"
+                class="main-image"
+                (error)="onImageError($event)">
+              
+              <!-- Navigation arrows -->
+              <button 
+                *ngIf="images.length > 1"
+                class="nav-btn nav-prev" 
+                (click)="previousImage()"
+                aria-label="Imagen anterior">
+                ‹
+              </button>
+              
+              <button 
+                *ngIf="images.length > 1"
+                class="nav-btn nav-next" 
+                (click)="nextImage()"
+                aria-label="Siguiente imagen">
+                ›
+              </button>
+
+              <!-- Image counter -->
+              <div *ngIf="images.length > 1" class="image-counter">
+                {{ currentImageIndex + 1 }} / {{ images.length }}
+              </div>
+            </div>
+
+            <!-- Thumbnail strip -->
+            <div *ngIf="images.length > 1" class="thumbnail-strip">
+              <button 
+                *ngFor="let image of images; let i = index"
+                class="thumbnail-btn"
+                [class.active]="i === currentImageIndex"
+                (click)="selectImage(i)">
+                <img 
+                  [src]="getImageWithFallback(image)"
+                  [alt]="'Imagen ' + (i + 1)"
+                  class="thumbnail-image"
+                  (error)="onImageError($event)">
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Info -->
+          <div class="product-info">
+            <div class="product-header">
+              <h1 class="product-title">{{ announcement.title }}</h1>
+              <div class="product-meta">
+                <span class="meta-item">
+                  👁️ {{ announcement.views || 0 }} vistas
+                </span>
+                <span class="meta-item">
+                  🕒 {{ getTimeAgo(announcement.created_at) }}
+                </span>
+                <span class="meta-item">
+                  📍 {{ announcement.location }}
+                </span>
+                <span *ngIf="announcement.price && announcement.price > 0" class="meta-item price-meta">
+                  💰 {{ formatPrice(announcement.price) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="product-description">
+              <h3>📝 Descripción</h3>
+              <p>{{ announcement.description }}</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+              <div class="action-buttons">
+                <button class="btn btn-primary" (click)="onSave()">
+                  💾 Guardar
+                </button>
+                <button 
+                  *ngIf="announcement.seller?.phone" 
+                  class="btn btn-secondary" 
+                  (click)="onContactWhatsApp()">
+                  📱 Contactar por WhatsApp
+                </button>
+                <button class="btn btn-outline" (click)="onShare()">
+                  📤 Compartir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seller Info Section -->
+    <section class="seller-section">
+      <div class="container">
+        <div class="seller-card">
+          <div class="seller-header">
+            <h2>👤 Información del vendedor</h2>
+          </div>
+          
+          <div class="seller-content" *ngIf="announcement.seller; else noSellerInfo">
+            <div class="seller-profile">
+              <div class="seller-avatar">
+                <img 
+                  *ngIf="announcement.seller.avatar; else defaultAvatar"
+                  [src]="announcement.seller.avatar"
+                  [alt]="announcement.seller.name"
+                  class="avatar-image"
+                  (error)="onImageError($event)">
+                
+                <ng-template #defaultAvatar>
+                  <div class="avatar-placeholder">
+                    👤
+                  </div>
+                </ng-template>
+                
+                <div class="online-status"></div>
+              </div>
+              
+              <div class="seller-info">
+                <h3 class="seller-name">
+                  {{ announcement.seller.name }}
+                  <span *ngIf="announcement.seller.surname"> {{ announcement.seller.surname }}</span>
+                </h3>
+                
+                <div class="seller-details">
+                  <p *ngIf="announcement.seller.city" class="seller-location">
+                    📍 {{ announcement.seller.city }}
+                  </p>
+                  
+                  <p class="seller-since">
+                    📅 Miembro desde {{ getTimeAgo(announcement.seller.memberSince || announcement.created_at) }}
+                  </p>
+                  
+                  <p *ngIf="announcement.seller.bio" class="seller-bio">
+                    💬 {{ announcement.seller.bio }}
+                  </p>
+                </div>
+                
+                <div class="seller-badges">
+                  <span class="badge verified">
+                    ✅ Verificado
+                  </span>
+                  <span *ngIf="announcement.seller.phone" class="badge phone">
+                    📞 Teléfono verificado
+                  </span>
+                  <span *ngIf="announcement.seller.email" class="badge email">
+                    ✉️ Email verificado
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noSellerInfo>
+            <div class="no-seller-info">
+              <div class="no-seller-avatar">
+                👤
+              </div>
+              <div class="no-seller-details">
+                <h3>Vendedor anónimo</h3>
+                <p>La información del vendedor no está disponible en este momento.</p>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </section>
+
+    <!-- Safety Tips -->
+    <section class="safety-section">
+      <div class="container">
+        <div class="safety-card">
+          <div class="safety-header">
+            <h3>🛡️ Consejos para comprar seguro en Tingo María</h3>
+          </div>
+          <div class="safety-content">
+            <div class="safety-grid">
+              <div class="safety-tip">
+                <div>📱</div>
+                <h4>Contacta por WhatsApp</h4>
+                <p>Habla directamente con el vendedor antes de encontrarte</p>
+              </div>
+              <div class="safety-tip">
+                <div>👀</div>
+                <h4>Revisa bien el producto</h4>
+                <p>Inspecciona todo antes de acordar el precio final</p>
+              </div>
+              <div class="safety-tip">
+                <div>📍</div>
+                <h4>Lugares conocidos</h4>
+                <p>Reúnanse en el centro, mercados o lugares concurridos</p>
+              </div>
+              <div class="safety-tip">
+                <div>💰</div>
+                <h4>Negocia el precio</h4>
+                <p>Los precios son referenciales, puedes negociar</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Products -->
+    <section *ngIf="relatedAnnouncements.length > 0" class="related-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>🔍 Anuncios similares en Tingo María</h2>
+          <p>Otros productos que podrían interesarte en tu zona</p>
+        </div>
+        
+        <div class="related-grid">
+          <div 
+            *ngFor="let related of relatedAnnouncements; trackBy: trackByAnnouncement" 
+            class="related-card"
+            (click)="viewRelatedAnnouncement(related)">
+            
+            <div class="related-image">
+              <img 
+                [src]="getImageWithFallback(related.image)"
+                [alt]="related.title"
+                class="card-image"
+                (error)="onImageError($event)">
+              
+              <div class="card-overlay">
+                👁️ Ver detalles
+              </div>
+            </div>
+            
+            <div class="related-content">
+              <h4 class="related-title">{{ related.title }}</h4>
+              <div class="related-price">{{ formatPrice(related.price) }}</div>
+              <div class="related-meta">
+                <span class="meta-location">
+                  📍 {{ related.location }}
+                </span>
+                <span class="meta-views">
+                  👁️ {{ related.views || 0 }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Platform Info Section -->
+    <section class="platform-info-section">
+      <div class="container">
+        <div class="platform-card">
+          <div class="platform-content">
+            <div class="platform-icon">
+              🎯
+            </div>
+            <div class="platform-text">
+              <h4>¡Publica gratis en AvisOnline!</h4>
+              <p>Cada usuario puede publicar hasta <strong>5 anuncios gratuitos</strong> en Tingo María. Conecta directamente con compradores locales.</p>
+            </div>
+            <div class="platform-actions">
+              <button class="btn btn-primary" onclick="window.open('/admin', '_blank')">
+                📝 Publicar anuncio
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" (click)="goBack()">
+    ← Volver
+  </button>
+</div> 

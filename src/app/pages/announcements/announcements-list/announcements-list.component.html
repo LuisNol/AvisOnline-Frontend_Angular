@@ -1,0 +1,336 @@
+<!-- Página de Lista de Anuncios -->
+<div class="announcements-list-page">
+  
+  <!-- Componente de Filtro -->
+  <app-announcements-filter
+    [initialFilters]="currentFilters"
+    (filtersChanged)="onFiltersChanged($event)"
+    (filtersApplied)="onFiltersApplied($event)">
+  </app-announcements-filter>
+
+  <!-- Contenido Principal -->
+  <div class="main-content">
+    <div class="container">
+      
+      <!-- Active Categories Filter Banner -->
+      <div *ngIf="activeCategoryNames.length > 0" class="active-category-banner">
+        <div class="category-filter-info">
+          <div class="category-icon">
+            <i class="bi bi-funnel-fill"></i>
+          </div>
+          <div class="category-details">
+            <h5 class="category-title">
+              Filtrando por {{ activeCategoryNames.length === 1 ? 'categoría' : 'categorías' }}
+            </h5>
+            <p class="category-name">{{ activeCategoryNames.join(', ') }}</p>
+          </div>
+          <button class="btn btn-outline-light btn-sm" (click)="clearCategoryFilter()" title="Limpiar filtros">
+            <i class="bi bi-x-lg"></i>
+            <span class="d-none d-md-inline ms-1">Limpiar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Header de Resultados -->
+      <div class="results-header">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="results-info">
+              <!-- Loading State -->
+              <div *ngIf="isLoading" class="loading-info">
+                <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                <span class="text-muted">{{loadingMessage}}</span>
+              </div>
+              
+              <!-- Results Summary -->
+              <div *ngIf="!isLoading" class="results-summary">
+                <h4 class="results-title">
+                  <i class="bi bi-megaphone me-2 text-primary"></i>
+                  <span *ngIf="activeCategoryNames.length === 0">Anuncios Clasificados</span>
+                  <span *ngIf="activeCategoryNames.length === 1">{{ activeCategoryNames[0] }}</span>
+                  <span *ngIf="activeCategoryNames.length > 1">{{ activeCategoryNames.length }} Categorías</span>
+                </h4>
+                <p class="results-subtitle text-muted mb-0">
+                  {{resultsSummary}}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="results-controls">
+              <!-- Connection Status -->
+              <div class="connection-badge me-3">
+                <span *ngIf="isConnected" class="badge bg-success">
+                  <i class="bi bi-wifi me-1"></i>
+                  Conectado
+                </span>
+                <span *ngIf="!isConnected" class="badge bg-warning text-dark">
+                  <i class="bi bi-wifi-off me-1"></i>
+                  Modo offline
+                </span>
+              </div>
+              
+              <!-- View Mode Toggle -->
+              <div class="view-toggle btn-group" role="group">
+                <button 
+                  type="button" 
+                  class="btn btn-outline-secondary"
+                  [class.active]="viewMode === 'grid'"
+                  (click)="setViewMode('grid')"
+                  title="Vista en cuadrícula">
+                  <i class="bi bi-grid-3x3-gap"></i>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-outline-secondary"
+                  [class.active]="viewMode === 'list'"
+                  (click)="setViewMode('list')"
+                  title="Vista en lista">
+                  <i class="bi bi-list-ul"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !isLoading" class="alert alert-warning">
+        <div class="row align-items-center">
+          <div class="col">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>{{error}}</strong>
+            <br>
+            <small class="text-muted">Mostrando datos de ejemplo mientras se restablece la conexión</small>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-outline-warning btn-sm" (click)="loadAnnouncements()">
+              <i class="bi bi-arrow-clockwise me-1"></i>
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Results State -->
+      <div *ngIf="noResults && !isLoading && !error" class="no-results">
+        <div class="text-center py-5">
+          <div class="no-results-icon mb-3">
+            <i class="bi bi-search text-muted"></i>
+          </div>
+          <h5 class="no-results-title">No se encontraron anuncios</h5>
+          <p class="no-results-message text-muted">
+            Intenta ajustar tus filtros de búsqueda para encontrar más resultados
+          </p>
+          <button class="btn btn-primary" (click)="onFiltersApplied({search: '', categorie_id: [], min_price: null, max_price: null, location: '', sort_by: 'recent'})">
+            <i class="bi bi-arrow-clockwise me-2"></i>
+            Ver todos los anuncios
+          </button>
+        </div>
+      </div>
+
+      <!-- Announcements Grid/List -->
+      <div *ngIf="!isLoading && !noResults" class="announcements-container">
+        
+        <!-- Grid View -->
+        <div *ngIf="viewMode === 'grid'" class="announcements-grid">
+          <div class="row g-4">
+            <div 
+              *ngFor="let announcement of announcements; trackBy: trackByAnnouncement" 
+              class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+              <div class="announcement-card" (click)="viewAnnouncementDetail(announcement)">
+                
+                <!-- Image -->
+                <div class="card-image">
+                  <img 
+                    [src]="getImageWithFallback(announcement.image)" 
+                    [alt]="announcement.title"
+                    class="card-img"
+                    loading="lazy"
+                    (load)="onImageLoad($event)"
+                    (error)="onImageError($event)">
+                  
+                  <!-- Featured Badge -->
+                  <div *ngIf="announcement.featured" class="featured-badge">
+                    <i class="bi bi-star-fill"></i>
+                  </div>
+                  
+                  <!-- Views Badge -->
+                  <div class="views-badge">
+                    <i class="bi bi-eye"></i>
+                    {{announcement.views}}
+                  </div>
+                </div>
+                
+                <!-- Card Content -->
+                <div class="card-content">
+                  <div class="card-header">
+                    <h6 class="card-title">{{announcement.title}}</h6>
+                    <div class="card-price">{{formatPrice(announcement.price)}}</div>
+                  </div>
+                  
+                  <p class="card-description">{{announcement.description}}</p>
+                  
+                  <div class="card-footer">
+                    <div class="card-meta">
+                      <div class="meta-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <span>{{announcement.location}}</span>
+                      </div>
+                      <div class="meta-item">
+                        <i class="bi bi-tag"></i>
+                        <span>{{announcement.category}}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="card-seller">
+                      <div class="seller-info">
+                        <i class="bi bi-person-circle me-1"></i>
+                        <span>{{announcement.seller?.name}}</span>
+                      </div>
+                      <small class="text-muted">{{getTimeAgo(announcement.created_at)}}</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- List View -->
+        <div *ngIf="viewMode === 'list'" class="announcements-list">
+          <div 
+            *ngFor="let announcement of announcements; trackBy: trackByAnnouncement" 
+            class="announcement-list-item" 
+            (click)="viewAnnouncementDetail(announcement)">
+            
+            <div class="row g-0 align-items-center">
+              <!-- Image -->
+              <div class="col-md-3 col-lg-2">
+                <div class="list-image">
+                  <img 
+                    [src]="getImageWithFallback(announcement.image)" 
+                    [alt]="announcement.title"
+                    class="list-img"
+                    loading="lazy"
+                    (load)="onImageLoad($event)"
+                    (error)="onImageError($event)">
+                  
+                  <!-- Featured Badge -->
+                  <div *ngIf="announcement.featured" class="featured-badge">
+                    <i class="bi bi-star-fill"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Content -->
+              <div class="col-md-9 col-lg-10">
+                <div class="list-content">
+                  <div class="row">
+                    <div class="col-lg-8">
+                      <div class="list-main">
+                        <h5 class="list-title">{{announcement.title}}</h5>
+                        <p class="list-description">{{announcement.description}}</p>
+                        
+                        <div class="list-meta">
+                          <span class="meta-item">
+                            <i class="bi bi-geo-alt"></i>
+                            {{announcement.location}}
+                          </span>
+                          <span class="meta-item">
+                            <i class="bi bi-tag"></i>
+                            {{announcement.category}}
+                          </span>
+                          <span class="meta-item">
+                            <i class="bi bi-eye"></i>
+                            {{announcement.views}} vistas
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                      <div class="list-sidebar">
+                        <div class="list-price">{{formatPrice(announcement.price)}}</div>
+                        
+                        <div class="list-seller">
+                          <div class="seller-info">
+                            <i class="bi bi-person-circle me-2"></i>
+                            <div>
+                              <div class="seller-name">{{announcement.seller?.name}}</div>
+                              <small class="text-muted">{{getTimeAgo(announcement.created_at)}}</small>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-sm w-100 mt-2">
+                          <i class="bi bi-eye me-2"></i>
+                          Ver detalles
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="lastPage > 1" class="pagination-container">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="pagination-info">
+                <small class="text-muted">{{getPaginationInfo()}}</small>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <nav aria-label="Navegación de páginas">
+                <ul class="pagination pagination-sm justify-content-md-end justify-content-center mb-0">
+                  <!-- Previous -->
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button 
+                      class="page-link" 
+                      (click)="goToPage(currentPage - 1)"
+                      [disabled]="currentPage === 1">
+                      <i class="bi bi-chevron-left"></i>
+                      <span class="d-none d-sm-inline ms-1">Anterior</span>
+                    </button>
+                  </li>
+                  
+                  <!-- Page Numbers -->
+                  <li 
+                    *ngFor="let page of getPaginationPages(); trackBy: trackByPage" 
+                    class="page-item"
+                    [class.active]="page === currentPage"
+                    [class.disabled]="page === -1">
+                    <button 
+                      *ngIf="page !== -1" 
+                      class="page-link" 
+                      (click)="goToPage(page)">
+                      {{page}}
+                    </button>
+                    <span *ngIf="page === -1" class="page-link">...</span>
+                  </li>
+                  
+                  <!-- Next -->
+                  <li class="page-item" [class.disabled]="currentPage === lastPage">
+                    <button 
+                      class="page-link" 
+                      (click)="goToPage(currentPage + 1)"
+                      [disabled]="currentPage === lastPage">
+                      <span class="d-none d-sm-inline me-1">Siguiente</span>
+                      <i class="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

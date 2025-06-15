@@ -1,0 +1,219 @@
+<!-- Footer Principal -->
+<footer class="main-footer">
+  <!-- Stats Section -->
+  <!-- <div class="footer-stats">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.totalUsers }}</div>
+            <div class="stat-label">Usuarios Activos</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-megaphone-fill"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.totalAnnouncements }}</div>
+            <div class="stat-label">Anuncios Publicados</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-geo-alt-fill"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.citiesCovered }}</div>
+            <div class="stat-label">Ciudad Cubierta</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-calendar-check-fill"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.yearsActive }}</div>
+            <div class="stat-label">Años de Experiencia</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- Main Footer Content -->
+  <div class="footer-content">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Brand Section -->
+        <div class="footer-section brand-section">
+          <div class="footer-brand">
+            <div class="brand-logo">
+              <i class="bi bi-megaphone-fill"></i>
+              <span class="brand-name">AvisOnline</span>
+            </div>
+            <p class="brand-description">
+              La plataforma de anuncios clasificados más confiable de Tingo María. 
+              Conectamos compradores y vendedores locales de forma segura y gratuita.
+            </p>
+          </div>
+          
+          <!-- Social Links -->
+          <div class="social-links">
+            <h4 class="social-title">Síguenos</h4>
+            <div class="social-buttons">
+              <a 
+                *ngFor="let social of socialLinks" 
+                [href]="social.url" 
+                target="_blank"
+                class="social-btn"
+                [style.background-color]="social.color"
+                [title]="social.name">
+                <i [class]="social.icon"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-section">
+          <h4 class="section-title">Enlaces Rápidos</h4>
+          <ul class="footer-links">
+            <li *ngFor="let link of quickLinks">
+              <a 
+                *ngIf="!link.external; else externalLink"
+                [routerLink]="link.route" 
+                class="footer-link">
+                <i class="bi bi-chevron-right"></i>
+                {{ link.name }}
+              </a>
+              <ng-template #externalLink>
+                <a 
+                  [href]="link.route" 
+                  target="_blank" 
+                  class="footer-link">
+                  <i class="bi bi-chevron-right"></i>
+                  {{ link.name }}
+                </a>
+              </ng-template>
+            </li>
+          </ul>
+        </div>
+
+        <!-- All Categories -->
+        <div class="footer-section">
+          <h4 class="section-title">Todas las Categorías</h4>
+          <ul class="footer-links">
+            <li *ngFor="let category of popularCategories">
+              <a 
+                (click)="navigateToCategory(category)"
+                class="footer-link clickable">
+                <i class="bi bi-chevron-right"></i>
+                {{ category.name }}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="footer-section">
+          <h4 class="section-title">Contacto</h4>
+          <div class="contact-info">
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="bi bi-geo-alt-fill"></i>
+              </div>
+              <div class="contact-details">
+                <span class="contact-label">Ubicación</span>
+                <span class="contact-value">{{ contactInfo.address }}</span>
+              </div>
+            </div>
+            
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="bi bi-telephone-fill"></i>
+              </div>
+              <div class="contact-details">
+                <span class="contact-label">Teléfono</span>
+                <span class="contact-value">{{ contactInfo.phone }}</span>
+              </div>
+            </div>
+            
+            <div class="contact-item" (click)="copyEmail()">
+              <div class="contact-icon">
+                <i class="bi bi-envelope-fill"></i>
+              </div>
+              <div class="contact-details">
+                <span class="contact-label">Email</span>
+                <span class="contact-value clickable">{{ contactInfo.email }}</span>
+              </div>
+            </div>
+            
+            <div class="contact-item">
+              <div class="whatsapp-buttons">
+                <button class="whatsapp-btn primary" (click)="openWhatsApp()">
+                  <i class="bi bi-whatsapp"></i>
+                  <span>Contáctanos por WhatsApp</span>
+                </button>
+                <button class="whatsapp-btn secondary" (click)="joinWhatsAppGroup()">
+                  <i class="bi bi-people-fill"></i>
+                  <span>Únete a nuestra comunidad</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="footer-cta">
+    <div class="container">
+      <div class="cta-content">
+        <div class="cta-text">
+          <h3>¿Listo para publicar tu anuncio?</h3>
+          <p>Únete a cientos de usuarios que ya venden en AvisOnline</p>
+        </div>
+        <div class="cta-actions">
+          <button class="cta-btn primary" (click)="navigateToExternal('https://www.admin.avisonline.store')">
+            <i class="bi bi-plus-circle"></i>
+            Publicar Gratis
+          </button>
+          <a routerLink="/anuncios" class="cta-btn secondary">
+            <i class="bi bi-search"></i>
+            Explorar Anuncios
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="bottom-content">
+        <div class="copyright">
+          <p>&copy; {{ currentYear }} AvisOnline. Todos los derechos reservados.</p>
+          <p class="made-with">Hecho con ❤️ en Tingo María, Perú</p>
+        </div>
+        
+        <div class="bottom-links">
+          <a href="#" class="bottom-link">Términos de Uso</a>
+          <a href="#" class="bottom-link">Política de Privacidad</a>
+          <a href="#" class="bottom-link">Ayuda</a>
+        </div>
+        
+        <button class="scroll-top-btn" (click)="scrollToTop()" title="Volver arriba">
+          <i class="bi bi-arrow-up"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</footer> 

@@ -1,0 +1,19 @@
+ASUNTO (Subject):
+Nuevo mensaje de contacto - {{subject}}
+
+CONTENIDO (Content):
+Hola,
+
+Has recibido un nuevo mensaje de contacto desde AvisOnline:
+
+Nombre: {{from_name}}
+Email: {{from_email}}
+Teléfono: {{phone}}
+Asunto: {{subject}}
+
+Mensaje:
+{{message}}
+
+---
+Este mensaje fue enviado desde el formulario de contacto de AvisOnline.
+Responder a: {{from_email}} 

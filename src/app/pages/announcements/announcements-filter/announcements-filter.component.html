@@ -1,0 +1,375 @@
+<!-- Filtros de Anuncios -->
+<div class="announcements-filter">
+  <!-- Header del filtro -->
+  <div class="filter-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h3 class="filter-title">
+            <i class="bi bi-funnel me-2"></i>
+            Filtrar Anuncios
+          </h3>
+          <p class="filter-subtitle ">
+            Encuentra exactamente lo que buscas
+          </p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <!-- Estado de conexión -->
+          <div class="connection-status">
+            <span *ngIf="isLoading" class="badge bg-primary">
+              <i class="bi bi-clock me-1"></i>
+              Cargando filtros...
+            </span>
+            <span *ngIf="!isLoading && isConnected" class="badge bg-success">
+              <i class="bi bi-wifi me-1"></i>
+              Conectado
+            </span>
+            <span *ngIf="!isLoading && !isConnected" class="badge bg-warning text-dark">
+              <i class="bi bi-wifi-off me-1"></i>
+              Modo offline
+            </span>
+          </div>
+          
+          <!-- Contador de filtros activos -->
+          <div *ngIf="hasActiveFilters()" class="active-filters-badge">
+            <span class="badge bg-info">
+              <i class="bi bi-funnel-fill me-1"></i>
+              {{getActiveFiltersCount()}} filtro(s) activo(s)
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error de conexión -->
+  <div *ngIf="error && !isLoading" class="alert alert-warning mx-3 mb-0">
+    <div class="container">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <strong>{{error}}</strong>
+      <br>
+      <small class="text-muted">Mostrando opciones básicas mientras se restablece la conexión</small>
+    </div>
+  </div>
+
+  <!-- Filtros principales -->
+  <div class="filter-main">
+    <div class="container">
+      <form (ngSubmit)="applyFilters()" class="filter-form">
+        <div class="row g-3">
+          <!-- Búsqueda por texto -->
+          <div class="col-lg-3 col-md-6">
+            <div class="filter-group">
+              <label class="filter-label">
+                <i class="bi bi-search me-2"></i>
+                Buscar
+              </label>
+              <div class="input-group">
+                <input 
+                  type="text" 
+                  class="form-control filter-input"
+                  placeholder="¿Qué estás buscando?"
+                  [(ngModel)]="filters.search"
+                  name="search"
+                  (input)="onFilterChange()">
+                <button 
+                  *ngIf="filters.search" 
+                  type="button" 
+                  class="btn btn-outline-secondary"
+                  (click)="filters.search = ''; onFilterChange()">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ubicación -->
+          <div class="col-lg-3 col-md-6">
+            <div class="filter-group">
+              <label class="filter-label">
+                <i class="bi bi-geo-alt me-2"></i>
+                Ubicación
+              </label>
+              <div class="input-group">
+                <input 
+                  type="text" 
+                  class="form-control filter-input"
+                  placeholder="Distrito o zona"
+                  [(ngModel)]="filters.location"
+                  name="location"
+                  (input)="onFilterChange()">
+                <button 
+                  *ngIf="filters.location" 
+                  type="button" 
+                  class="btn btn-outline-secondary"
+                  (click)="filters.location = ''; onFilterChange()">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ordenamiento -->
+          <div class="col-lg-3 col-md-6">
+            <div class="filter-group">
+              <label class="filter-label">
+                <i [class]="getCurrentSortIcon() + ' me-2'"></i>
+                Ordenar por
+              </label>
+              <select 
+                class="form-select filter-input"
+                [(ngModel)]="filters.sort_by"
+                name="sort_by"
+                (change)="onFilterChange()">
+                <option *ngFor="let option of sortOptions" [value]="option.value">
+                  {{option.label}}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="col-lg-3 col-md-6">
+            <div class="filter-group">
+              <label class="filter-label d-block">&nbsp;</label>
+              <div class="filter-actions d-flex gap-2">
+                <button 
+                  type="button" 
+                  class="btn btn-outline-secondary flex-fill"
+                  (click)="toggleAdvancedFilters()"
+                  [class.active]="showAdvancedFilters">
+                  <i class="bi bi-sliders me-2"></i>
+                  Más filtros
+                  <span *ngIf="getAdvancedFiltersCount() > 0" class="badge bg-warning text-dark ms-2">
+                    {{getAdvancedFiltersCount()}}
+                  </span>
+                </button>
+                <button 
+                  type="submit" 
+                  class="btn btn-primary flex-fill">
+                <i class="bi bi-search me-2"></i>
+                Buscar
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Resumen de filtros activos -->
+  <div *ngIf="hasActiveFilters()" class="active-filters-summary">
+    <div class="container">
+      <div class="filters-summary-content">
+        <span class="summary-label">Filtros activos:</span>
+        
+        <!-- Filtro de búsqueda -->
+        <span *ngIf="filters.search" class="filter-tag">
+          <i class="bi bi-search me-1"></i>
+          "{{filters.search}}"
+          <button type="button" (click)="filters.search = ''; onFilterChange()">
+            <i class="bi bi-x"></i>
+          </button>
+        </span>
+
+        <!-- Filtro de ubicación -->
+        <span *ngIf="filters.location" class="filter-tag">
+          <i class="bi bi-geo-alt me-1"></i>
+          {{filters.location}}
+          <button type="button" (click)="filters.location = ''; onFilterChange()">
+            <i class="bi bi-x"></i>
+          </button>
+        </span>
+
+        <!-- Filtros de categorías (múltiples) -->
+        <span *ngFor="let categoryId of filters.categorie_id" class="filter-tag">
+          <i class="bi bi-grid me-1"></i>
+          {{getCategoryName(categoryId)}}
+          <button type="button" (click)="selectCategory(categoryId)">
+            <i class="bi bi-x"></i>
+          </button>
+        </span>
+
+        <!-- Filtro de precio -->
+        <span *ngIf="filters.min_price || filters.max_price" class="filter-tag">
+                          <i class="bi bi-currency-dollar me-1"></i>
+                      <span *ngIf="filters.min_price && filters.max_price">S/{{filters.min_price}} - S/{{filters.max_price}}</span>
+            <span *ngIf="filters.min_price && !filters.max_price">Desde S/{{filters.min_price}}</span>
+            <span *ngIf="!filters.min_price && filters.max_price">Hasta S/{{filters.max_price}}</span>
+          <button type="button" (click)="filters.min_price = null; filters.max_price = null; onFilterChange()">
+            <i class="bi bi-x"></i>
+          </button>
+        </span>
+
+        <!-- Filtro de ordenamiento -->
+        <span *ngIf="filters.sort_by !== 'recent'" class="filter-tag">
+          <i [class]="getCurrentSortIcon() + ' me-1'"></i>
+          {{getCurrentSortLabel()}}
+          <button type="button" (click)="filters.sort_by = 'recent'; onFilterChange()">
+            <i class="bi bi-x"></i>
+          </button>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar Overlay -->
+<div 
+  class="sidebar-overlay" 
+  [class.show]="isSidebarOpen"
+  (click)="closeSidebar()"></div>
+
+<!-- Sidebar de Filtros Avanzados -->
+<div class="filters-sidebar" [class.open]="isSidebarOpen">
+  <div class="sidebar-header">
+    <h4 class="sidebar-title">
+      <i class="bi bi-sliders me-2"></i>
+      Filtros Avanzados
+    </h4>
+    <button 
+      type="button" 
+      class="btn-close sidebar-close"
+      (click)="closeSidebar()"
+      aria-label="Cerrar filtros"></button>
+  </div>
+
+  <div class="sidebar-content">
+    <form (ngSubmit)="applyFilters()" class="sidebar-form">
+      
+      <!-- Categorías -->
+      <div class="filter-section">
+        <h5 class="filter-section-title">
+          <i class="bi bi-grid me-2"></i>
+          Categorías
+        </h5>
+        
+        <!-- Loading de categorías -->
+        <div *ngIf="isLoading" class="text-center py-3">
+          <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+          <span class="text-muted">Cargando categorías...</span>
+        </div>
+
+        <!-- Lista de categorías -->
+        <div *ngIf="!isLoading" class="categories-list">
+          <div 
+            *ngFor="let category of filterConfig.categories; trackBy: trackByCategory" 
+            class="category-filter-item"
+            [class.active]="isCategorySelected(category.id)"
+            (click)="selectCategory(category.id)">
+            <div class="category-content">
+              <div class="category-icon">
+                <i [class]="category.icon || 'bi-tag'"></i>
+              </div>
+              <div class="category-info">
+                <div class="category-name">{{category.name}}</div>
+                <div class="category-count">{{category.products_count}} anuncios</div>
+              </div>
+            </div>
+            <div class="category-check">
+              <i class="bi bi-check-circle-fill" *ngIf="isCategorySelected(category.id)"></i>
+              <i class="bi bi-circle" *ngIf="!isCategorySelected(category.id)"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rango de precios -->
+      <div class="filter-section">
+        <h5 class="filter-section-title">
+                          <i class="bi bi-currency-dollar me-2"></i>
+          Rango de Precio
+        </h5>
+        
+        <div class="price-filter">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label small">Precio mínimo</label>
+              <div class="input-group">
+                <span class="input-group-text">S/</span>
+                <input 
+                  type="number" 
+                  class="form-control"
+                  placeholder="0"
+                  [min]="filterConfig.price_range.min_price"
+                  [max]="filterConfig.price_range.max_price"
+                  [(ngModel)]="filters.min_price"
+                  name="min_price"
+                  (input)="onFilterChange()">
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Precio máximo</label>
+              <div class="input-group">
+                <span class="input-group-text">S/</span>
+                <input 
+                  type="number" 
+                  class="form-control"
+                  [placeholder]="filterConfig.price_range.max_price.toString()"
+                  [min]="filterConfig.price_range.min_price"
+                  [max]="filterConfig.price_range.max_price"
+                  [(ngModel)]="filters.max_price"
+                  name="max_price"
+                  (input)="onFilterChange()">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Rangos de precio predefinidos -->
+          <div class="price-presets mt-3">
+            <div class="d-grid gap-2">
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary btn-sm"
+                [class.active]="isPriceRangeActive(null, 100)"
+                (click)="setPriceRange(null, 100)">
+                Hasta S/100
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary btn-sm"
+                [class.active]="isPriceRangeActive(100, 500)"
+                (click)="setPriceRange(100, 500)">
+                S/100 - S/500
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary btn-sm"
+                [class.active]="isPriceRangeActive(500, null)"
+                (click)="setPriceRange(500, null)">
+                Más de S/500
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+    <div class="row g-2">
+      <div class="col-6">
+        <button 
+          type="button" 
+          class="btn btn-outline-danger w-100"
+          (click)="resetAdvancedFilters()"
+          [disabled]="!hasAdvancedFilters()">
+          <i class="bi bi-trash me-2"></i>
+          Limpiar
+        </button>
+      </div>
+      <div class="col-6">
+        <button 
+          type="button" 
+          class="btn btn-primary w-100"
+          (click)="applyAndCloseSidebar()">
+          <i class="bi bi-search me-2"></i>
+          Aplicar
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

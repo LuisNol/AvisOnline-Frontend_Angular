@@ -1,0 +1,289 @@
+<!-- Header Principal -->
+<header class="main-header" [class.scrolled]="isScrolled">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="container">
+      <div class="top-bar-content">
+        <div class="top-bar-left">
+          <div class="stats-info">
+            <span class="stat-item">
+              <i class="bi bi-megaphone"></i>
+              {{ formatNumber(stats.totalAnnouncements) }}+ anuncios
+            </span>
+            <span class="stat-item">
+              <i class="bi bi-people"></i>
+              {{ formatNumber(stats.totalUsers) }}+ usuarios
+            </span>
+          </div>
+        </div>
+        
+        <div class="top-bar-right">
+          <div class="location-info">
+            <i class="bi bi-geo-alt"></i>
+            <span>Tingo María, Huánuco</span>
+          </div>
+          <div class="contact-info">
+            <i class="bi bi-whatsapp"></i>
+            <span>WhatsApp: +51 964 261 822</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation -->
+  <nav class="main-nav">
+    <div class="container">
+      <div class="nav-content">
+        <!-- Logo -->
+        <div class="brand">
+          <a routerLink="/" class="brand-link">
+            <div class="brand-icon">
+              <img src="assets/logo/logo.png" alt="AvisOnline Logo" class="brand-logo">
+            </div>
+            <div class="brand-text">
+              <span class="brand-name">AvisOnline</span>
+              <span class="brand-tagline">Tingo María</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="desktop-nav">
+          <!-- Main Menu -->
+          <ul class="main-menu">
+            <li class="menu-item">
+              <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="menu-link">
+                <i class="bi bi-house"></i>
+                <span>Inicio</span>
+              </a>
+            </li>
+            
+            <li class="menu-item">
+              <a routerLink="/anuncios" routerLinkActive="active" class="menu-link">
+                <i class="bi bi-megaphone"></i>
+                <span>Anuncios</span>
+              </a>
+            </li>
+            
+            <li class="menu-item">
+              <a routerLink="/nosotros" routerLinkActive="active" class="menu-link">
+                <i class="bi bi-people"></i>
+                <span>Nosotros</span>
+              </a>
+            </li>
+            
+            <li class="menu-item">
+              <a routerLink="/contactanos" routerLinkActive="active" class="menu-link">
+                <i class="bi bi-chat-dots"></i>
+                <span>Contactanos</span>
+              </a>
+            </li>
+          </ul>
+
+          <!-- Action Buttons -->
+          <div class="nav-actions">
+            <!-- Search Button -->
+            <button class="action-btn search-btn" (click)="toggleSearch()" [class.active]="isSearchOpen">
+              <i class="bi bi-search"></i>
+            </button>
+
+            <!-- Publish Button -->
+            <button class="action-btn publish-btn" (click)="navigateToPublish()">
+              <i class="bi bi-plus-circle"></i>
+              <span>Publicar Gratis</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay" [class.active]="isSearchOpen" (click)="closeSearch()">
+    <div class="search-container" (click)="$event.stopPropagation()">
+      <div class="search-header">
+        <h3>¿Qué estás buscando?</h3>
+        <button class="close-search" (click)="closeSearch()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      
+      <form (ngSubmit)="onQuickSearch()" class="search-form">
+        <!-- Categorías seleccionadas (si existen) -->
+        <div class="selected-categories" *ngIf="selectedCategoryIds.length > 0">
+          <div class="category-chips">
+            <div 
+              class="category-chip" 
+              *ngFor="let categoryId of selectedCategoryIds; let i = index">
+              <i [class]="getCategoryIcon(categoryId)"></i>
+              <span>{{ getCategoryName(categoryId) }}</span>
+              <button type="button" class="remove-category" (click)="removeCategoryById(categoryId)">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+            <button type="button" class="clear-all-categories" (click)="clearCategorySelection()" *ngIf="selectedCategoryIds.length > 1">
+              <i class="bi bi-x-circle"></i>
+              Limpiar todo
+            </button>
+          </div>
+        </div>
+
+        <div class="search-inputs">
+          <div class="search-field">
+            <i class="bi bi-search"></i>
+            <input 
+              type="text" 
+              class="search-input"
+              placeholder="Buscar productos, servicios..."
+              [(ngModel)]="searchQuery"
+              name="searchQuery"
+              (keydown)="onSearchKeydown($event)">
+          </div>
+          
+          <div class="search-field">
+            <i class="bi bi-geo-alt"></i>
+            <input 
+              type="text" 
+              class="search-input"
+              placeholder="Distrito o zona"
+              [(ngModel)]="searchLocation"
+              name="searchLocation"
+              (keydown)="onSearchKeydown($event)">
+          </div>
+        </div>
+        
+        <button type="submit" class="search-submit-btn" [disabled]="!searchQuery.trim() && selectedCategoryIds.length === 0">
+          <i class="bi bi-search"></i>
+          Buscar Anuncios
+          <span class="search-count" *ngIf="selectedCategoryIds.length > 0">({{ selectedCategoryIds.length }} categoría{{ selectedCategoryIds.length > 1 ? 's' : '' }})</span>
+        </button>
+      </form>
+      
+      <div class="search-suggestions" *ngIf="categories.length > 0">
+        <h4>Categorías populares</h4>
+        <div class="category-menu">
+          <button 
+            *ngFor="let category of categories" 
+            (click)="toggleCategorySelection(category)"
+            class="category-item"
+            [class.selected]="isCategorySelected(category.id)">
+            <i [class]="category.icon"></i>
+            <span>{{ category.name }}</span>
+            <i class="bi bi-check-circle-fill selected-icon" *ngIf="isCategorySelected(category.id)"></i>
+          </button>
+        </div>
+        
+        <!-- Botón para ir directamente a categorías seleccionadas -->
+        <div class="category-actions" *ngIf="selectedCategoryIds.length > 0">
+          <button 
+            type="button" 
+            class="category-action-btn"
+            (click)="onQuickSearch()">
+            <i class="bi bi-arrow-right"></i>
+            Ver anuncios de {{ getSelectedCategoryNames().join(', ') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.active]="isMobileMenuOpen">
+    <div class="mobile-menu-header">
+      <div class="mobile-brand">
+        <img src="assets/logo/logo.png" alt="AvisOnline Logo" class="mobile-brand-logo">
+        <span>AvisOnline</span>
+      </div>
+      <button class="close-mobile-menu" (click)="closeMobileMenu()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    
+    <div class="mobile-menu-content">
+      <!-- Quick Actions -->
+      <div class="mobile-actions">
+        <button class="mobile-action-btn primary" (click)="navigateToPublish(); closeMobileMenu()">
+          <i class="bi bi-plus-circle"></i>
+          <span>Publicar Anuncio Gratis</span>
+        </button>
+        
+        <button class="mobile-action-btn secondary" (click)="toggleSearch(); closeMobileMenu()">
+          <i class="bi bi-search"></i>
+          <span>Buscar Anuncios</span>
+        </button>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="mobile-nav">
+        <ul class="mobile-menu-list">
+          <li class="mobile-menu-item">
+            <a routerLink="/" (click)="closeMobileMenu()" class="mobile-menu-link">
+              <i class="bi bi-house"></i>
+              <span>Inicio</span>
+            </a>
+          </li>
+          
+          <li class="mobile-menu-item">
+            <a routerLink="/anuncios" (click)="closeMobileMenu()" class="mobile-menu-link">
+              <i class="bi bi-megaphone"></i>
+              <span>Anuncios</span>
+            </a>
+          </li>
+          
+          <li class="mobile-menu-item">
+            <a routerLink="/nosotros" (click)="closeMobileMenu()" class="mobile-menu-link">
+              <i class="bi bi-people"></i>
+              <span>Nosotros</span>
+            </a>
+          </li>
+          
+          <li class="mobile-menu-item">
+            <a routerLink="/contactanos" (click)="closeMobileMenu()" class="mobile-menu-link">
+              <i class="bi bi-chat-dots"></i>
+              <span>Contactanos</span>
+            </a>
+          </li>
+        </ul>
+        
+        <!-- Categories -->
+        <div class="mobile-categories" *ngIf="categories.length > 0">
+          <h4 class="mobile-section-title">Categorías Populares</h4>
+          <div class="mobile-categories-grid">
+            <button 
+              *ngFor="let category of categories" 
+              (click)="navigateToCategory(category)"
+              class="mobile-category-item">
+              <i [class]="category.icon"></i>
+              <span>{{ category.name }}</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Mobile Footer -->
+      <div class="mobile-menu-footer">
+        <div class="mobile-contact">
+          <div class="contact-item">
+            <i class="bi bi-geo-alt"></i>
+            <span>Tingo María, Huánuco</span>
+          </div>
+          <div class="contact-item">
+            <i class="bi bi-whatsapp"></i>
+            <span>+51 964 261 822</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Backdrop -->
+  <div class="mobile-menu-backdrop" [class.active]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+</header> 
