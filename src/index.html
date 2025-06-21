@@ -10,13 +10,33 @@
   <link rel="shortcut icon" type="image/x-icon" href="assets/logo/logo.png">
   <link rel="icon" type="image/png" href="assets/logo/logo.png">
 
-  <!-- Google Analytics -->
+  <!-- Google Analytics + UTM Tracking -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q186NQWYXM"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){ dataLayer.push(arguments); }
+
     gtag('js', new Date());
-    gtag('config', 'G-Q186NQWYXM');
+
+    // Leer parámetros UTM si existen
+    function getUTMParams() {
+      const params = new URLSearchParams(window.location.search);
+      const utm_source = params.get('utm_source');
+      const utm_medium = params.get('utm_medium');
+      const utm_campaign = params.get('utm_campaign');
+
+      const config = {
+        page_path: window.location.pathname + window.location.search
+      };
+
+      if (utm_source) config.utm_source = utm_source;
+      if (utm_medium) config.utm_medium = utm_medium;
+      if (utm_campaign) config.utm_campaign = utm_campaign;
+
+      return config;
+    }
+
+    gtag('config', 'G-Q186NQWYXM', getUTMParams());
   </script>
 
   <!-- Clarity -->

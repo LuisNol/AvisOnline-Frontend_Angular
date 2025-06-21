@@ -1,5 +1,6 @@
+// src/app/app.ts
 import { Component, OnInit, isDevMode, inject } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -13,6 +14,7 @@ declare let clarity: Function;
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [RouterOutlet, CommonModule, HeaderComponent, FooterComponent, WhatsappFloatComponent],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
@@ -20,17 +22,39 @@ declare let clarity: Function;
 export class AppComponent implements OnInit {
   title = 'AvisOnline - Anuncios Clasificados';
   private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
 
   ngOnInit() {
-    // Google Analytics y Clarity en cada cambio de ruta
+    // Captura parámetros UTM si existen en URL
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
+    ).subscribe((event: NavigationEnd) => {
+      const queryParams = this.activatedRoute.snapshot.queryParams;
+      const utmSource = queryParams['utm_source'];
+      const utmMedium = queryParams['utm_medium'];
+      const utmCampaign = queryParams['utm_campaign'];
+
+      // Guarda en localStorage para uso futuro si existen
+      if (utmSource || utmMedium || utmCampaign) {
+        const utmData = {
+          utm_source: utmSource,
+          utm_medium: utmMedium,
+          utm_campaign: utmCampaign
+        };
+        localStorage.setItem('utm_data', JSON.stringify(utmData));
+      }
+
+      // Enviar página a Google Analytics
       if (typeof gtag === 'function') {
         gtag('config', 'G-Q186NQWYXM', {
-          page_path: event.urlAfterRedirects
+          page_path: event.urlAfterRedirects,
+          ...(utmSource && { utm_source: utmSource }),
+          ...(utmMedium && { utm_medium: utmMedium }),
+          ...(utmCampaign && { utm_campaign: utmCampaign })
         });
       }
+
+      // Enviar a Clarity
       if (typeof clarity === 'function' && !isDevMode()) {
         clarity('set', 'page', event.urlAfterRedirects);
         clarity('send', 'pageview');
